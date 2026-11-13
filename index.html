@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="manifest.webmanifest">
+<title>MONEQ DEAL FINDER</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#151d31;--muted:#9aa8c2;--line:#29344d;--green:#5ee0a0;--blue:#86a9ff}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(160deg,#101a31,#080c17 55%);color:#f4f7ff;font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:760px;margin:auto;padding:22px 15px 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px}.brand{font-size:12px;letter-spacing:2px;color:var(--muted)}h1{font-size:26px;margin:7px 0}.sub{color:var(--muted);font-size:13px;line-height:1.5}
+.pill{border:1px solid #356b56;color:var(--green);border-radius:30px;padding:6px 10px;font-size:11px}
+nav{display:flex;gap:8px;overflow:auto;margin:22px 0 16px}nav button{white-space:nowrap}
+button,.btn{background:#253452;color:#fff;border:1px solid #344563;border-radius:12px;padding:11px 13px;font-weight:650;font-size:13px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+button.primary{background:#23664d;border-color:#348564}button.ghost{background:transparent}button:active{transform:scale(.98)}
+section{display:none}section.active{display:block}.panel{background:rgba(21,29,49,.94);border:1px solid var(--line);border-radius:18px;padding:16px;margin:12px 0}
+h2{font-size:17px;margin:0 0 13px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:flex;flex-direction:column;gap:6px;margin:9px 0}.field.full{grid-column:1/-1}label{font-size:12px;color:var(--muted)}
+input,select,textarea{width:100%;background:#0c1426;border:1px solid #33415d;color:#fff;border-radius:10px;padding:12px;font-size:15px;min-width:0}textarea{min-height:70px;resize:vertical}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stat{background:#0d1629;border-radius:13px;padding:12px}.stat small{color:var(--muted);display:block;font-size:11px}.stat b{display:block;font-size:18px;margin-top:5px}
+.item{border:1px solid var(--line);border-radius:14px;padding:13px;margin:10px 0;background:#10192b}.itemhead{display:flex;justify-content:space-between;gap:10px}.price{font-size:18px;font-weight:800}.meta{color:var(--muted);font-size:12px;margin-top:5px;line-height:1.5}.profit{color:var(--green);font-weight:750}.warn{color:#ffd27a}.empty{color:var(--muted);font-size:13px;padding:15px;text-align:center}
+a{color:#a9c2ff}.note{font-size:12px;color:var(--muted);line-height:1.55}.tag{font-size:10px;padding:4px 7px;border-radius:20px;background:#243b34;color:#8df0bd}
+@media(max-width:480px){.grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:repeat(3,1fr)}.stat b{font-size:15px}}
+</style>
+</head>
+<body>
+<main>
+ <div class="top"><div><div class="brand">MONEQ / RESALE TOOLS</div><h1>DEAL FINDER</h1><div class="sub">중고 매물 기록 · 예상 차익 분석 · 조건 알림</div></div><span class="pill">FREE MVP</span></div>
+ <nav>
+  <button data-tab="dashboard" class="primary">대시보드</button>
+  <button data-tab="rules">알림 조건</button>
+  <button data-tab="add">매물 등록</button>
+  <button data-tab="search">검색 바로가기</button>
+ </nav>
+ <section id="dashboard" class="active">
+  <div class="stats">
+   <div class="stat"><small>등록 매물</small><b id="count">0</b></div>
+   <div class="stat"><small>조건 충족</small><b id="qualified">0</b></div>
+   <div class="stat"><small>예상 차익 합계</small><b id="sum">0원</b></div>
+  </div>
+  <div class="panel"><h2>최근 매물</h2><div id="listingList"></div></div>
+  <p class="note">이 앱은 입력한 매물의 가격을 분석하는 무료 MVP입니다. 현재 당근·번개장터의 전체 매물을 자동 수집하지 않습니다. 플랫폼이 허용하는 공식 연동이 확보되면 자동 수집 기능을 연결할 수 있습니다.</p>
+ </section>
+ <section id="rules">
+  <div class="panel">
+   <h2>꿀매물 알림 조건</h2>
+   <div class="field"><label>검색 키워드 (예: 아이폰 14, 에어팟 프로)</label><input id="keyword" placeholder="키워드 입력"></div>
+   <div class="grid">
+    <div class="field"><label>최대 구매 가격 (원)</label><input id="maxBuy" type="number" min="0" placeholder="300000"></div>
+    <div class="field"><label>최소 예상 차익 (원)</label><input id="minProfit" type="number" min="0" placeholder="30000"></div>
+    <div class="field"><label>예상 재판매 가격 (원)</label><input id="resale" type="number" min="0" placeholder="400000"></div>
+    <div class="field"><label>거래 플랫폼</label><select id="platform"><option>전체</option><option>번개장터</option><option>당근</option><option>기타</option></select></div>
+   </div>
+   <div class="field"><label>검색 페이지 주소 (선택, 직접 복사해서 입력)</label><input id="searchUrl" type="url" placeholder="https://..."></div>
+   <div class="actions"><button class="primary" id="saveRule">조건 저장</button><button id="notifyBtn">알림 권한 켜기</button></div>
+   <div id="ruleStatus" class="note" style="margin-top:10px"></div>
+  </div>
+  <div class="panel"><h2>저장된 조건</h2><div id="ruleView" class="empty">저장된 조건이 없습니다.</div></div>
+ </section>
+ <section id="add">
+  <div class="panel">
+   <h2>매물 직접 등록 / 분석</h2>
+   <div class="field"><label>상품명</label><input id="title" placeholder="예: 아이폰 14 128GB"></div>
+   <div class="grid">
+    <div class="field"><label>플랫폼</label><select id="source"><option>번개장터</option><option>당근</option><option>기타</option></select></div>
+    <div class="field"><label>판매 가격 (원)</label><input id="buy" type="number" min="0" placeholder="300000"></div>
+    <div class="field"><label>예상 재판매 가격 (원)</label><input id="sell" type="number" min="0" placeholder="400000"></div>
+    <div class="field"><label>예상 비용 (수수료·배송 등)</label><input id="cost" type="number" min="0" value="0"></div>
+   </div>
+   <div class="field"><label>매물 링크 (선택)</label><input id="url" type="url" placeholder="https://..."></div>
+   <div class="actions"><button class="primary" id="addListing">분석하고 저장</button><button id="demo">예시 매물 넣기</button></div>
+   <div id="preview" class="note" style="margin-top:12px"></div>
+  </div>
+ </section>
+ <section id="search">
+  <div class="panel">
+   <h2>플랫폼 검색 바로가기</h2>
+   <p class="note">각 플랫폼에서 직접 검색한 뒤 매물 주소와 가격을 이 앱에 등록하세요. 검색 URL은 해당 서비스에서 복사해 알림 조건에 저장할 수 있습니다.</p>
+   <div class="field"><label>검색할 키워드</label><input id="searchTerm" placeholder="예: 아이폰 14"></div>
+   <div class="actions"><button id="copyTerm">키워드 복사</button></div>
+   <div class="field"><label>번개장터 검색 URL</label><input id="bunjangUrl" placeholder="플랫폼에서 복사한 검색 주소"></div>
+   <div class="field"><label>당근 검색 URL</label><input id="daangnUrl" placeholder="플랫폼에서 복사한 검색 주소"></div>
+   <div class="actions"><button id="openBunjang">번개장터 검색 열기</button><button id="openDaangn">당근 검색 열기</button></div>
+  </div>
+  <div class="panel"><h2>아이폰에서 사용하기</h2><ol class="note"><li>웹앱을 HTTPS 주소로 배포해 Safari에서 엽니다.</li><li>공유 버튼 → 홈 화면에 추가를 누릅니다.</li><li>알림은 알림 권한을 허용하고 앱이 열려 있는 동안 조건을 확인합니다.</li></ol></div>
+ </section>
+ <div class="note" style="text-align:center;margin-top:25px">MONEQ DEAL FINDER · 데이터는 이 기기의 브라우저에 저장됩니다.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const read=k=>JSON.parse(localStorage.getItem(k)||'[]');
+const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+let rules=read('moneq_rules'), listings=read('moneq_listings');
+function won(n){return Number(n||0).toLocaleString('ko-KR')+'원'}
+function profit(x){return Number(x.sell||0)-Number(x.buy||0)-Number(x.cost||0)}
+function qualifies(x){return rules.some(r=>(!r.keyword||x.title.toLowerCase().includes(r.keyword.toLowerCase()))&&(!r.platform||r.platform==='전체'||r.platform===x.source)&&Number(x.buy)<=Number(r.maxBuy||Infinity)&&profit(x)>=Number(r.minProfit||0))}
+function render(){
+ $('count').textContent=listings.length;
+ $('qualified').textContent=listings.filter(qualifies).length;
+ $('sum').textContent=won(listings.reduce((s,x)=>s+Math.max(0,profit(x)),0));
+ $('listingList').innerHTML=listings.length?listings.slice().reverse().map((x,i)=>card(x,listings.length-1-i)).join(''):'<div class="empty">아직 등록된 매물이 없습니다. 매물 등록에서 시작하세요.</div>';
+ $('ruleView').innerHTML=rules.length?rules.map((r,i)=>`<div class="item"><b>${esc(r.keyword||'전체 키워드')}</b><div class="meta">${esc(r.platform)} · 최대 ${won(r.maxBuy)} · 최소 차익 ${won(r.minProfit)}<br>재판매 기준 ${won(r.resale)}</div><div class="actions"><button onclick="delRule(${i})">삭제</button>${r.searchUrl?`<a class="btn" href="${safeUrl(r.searchUrl)}" target="_blank" rel="noopener">검색 열기</a>`:''}</div></div>`).join(''):'<div class="empty">저장된 조건이 없습니다.</div>';
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeUrl(u){try{let x=new URL(u);return ['https:','http:'].includes(x.protocol)?esc(x.href):'#'}catch{return '#'}}
+function card(x,i){let p=profit(x);return `<div class="item"><div class="itemhead"><div><b>${esc(x.title)}</b><div class="meta">${esc(x.source)} · ${new Date(x.created).toLocaleString('ko-KR')}</div></div><span class="tag">${qualifies(x)?'조건 충족':'분석 완료'}</span></div><div class="price">${won(x.buy)}</div><div class="meta">재판매 예상 ${won(x.sell)} · 예상 비용 ${won(x.cost)}</div><div class="${p>=0?'profit':'warn'}" style="margin-top:8px">예상 차익 ${p>=0?'+':''}${won(p)}</div><div class="actions">${x.url?`<a class="btn" href="${safeUrl(x.url)}" target="_blank" rel="noopener">원본 매물 보기</a>`:''}<button onclick="removeListing(${i})">삭제</button></div></div>`}
+window.delRule=i=>{rules.splice(i,1);write('moneq_rules',rules);render()};
+window.removeListing=i=>{listings.splice(i,1);write('moneq_listings',listings);render()};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.remove('primary'));b.classList.add('primary');document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));$(b.dataset.tab).classList.add('active')});
+$('saveRule').onclick=()=>{let r={keyword:$('keyword').value.trim(),maxBuy:+$('maxBuy').value||0,minProfit:+$('minProfit').value||0,resale:+$('resale').value||0,platform:$('platform').value,searchUrl:$('searchUrl').value.trim()};if(!r.keyword&&!r.maxBuy&&!r.minProfit){$('ruleStatus').textContent='키워드 또는 가격 조건을 하나 이상 입력해 주세요.';return}rules.push(r);write('moneq_rules',rules);$('ruleStatus').textContent='조건을 저장했습니다. 새로 등록한 매물부터 조건을 확인합니다.';render()};
+$('addListing').onclick=()=>{let x={title:$('title').value.trim(),source:$('source').value,buy:+$('buy').value||0,sell:+$('sell').value||0,cost:+$('cost').value||0,url:$('url').value.trim(),created:Date.now()};if(!x.title||!x.buy||!x.sell){$('preview').textContent='상품명, 판매 가격, 재판매 가격을 입력해 주세요.';return}listings.push(x);write('moneq_listings',listings);let p=profit(x);$('preview').innerHTML=`예상 차익: <b class="${p>=0?'profit':'warn'}">${p>=0?'+':''}${won(p)}</b>`;if(qualifies(x))notify(x);render()};
+$('demo').onclick=()=>{listings.push({title:'예시 · 무선 이어폰 (가상 매물)',source:'기타',buy:50000,sell:85000,cost:5000,url:'',created:Date.now()});write('moneq_listings',listings);render();$('preview').textContent='가상 예시 매물을 추가했습니다.'};
+async function notify(x){if(!('Notification'in window))return;if(Notification.permission==='granted')new Notification('MONEQ 꿀매물 조건 충족',{body:`${x.title} · 예상 차익 ${won(profit(x))}`});}
+$('notifyBtn').onclick=async()=>{if(!('Notification'in window)){$('ruleStatus').textContent='이 브라우저는 알림을 지원하지 않습니다.';return}let p=await Notification.requestPermission();$('ruleStatus').textContent=p==='granted'?'알림 권한이 허용됐습니다. 앱이 열려 있을 때 등록 매물 조건을 확인합니다.':'알림 권한이 허용되지 않았습니다.'};
+$('copyTerm').onclick=async()=>{try{await navigator.clipboard.writeText($('searchTerm').value);alert('키워드를 복사했습니다.')}catch{alert('키워드를 선택해 복사해 주세요.')}};
+function openSearch(id){let u=$(id).value.trim();if(!u){alert('플랫폼에서 복사한 검색 URL을 먼저 입력해 주세요.');return}try{let x=new URL(u);if(!['https:','http:'].includes(x.protocol))throw 0;window.open(x.href,'_blank','noopener')}catch{alert('올바른 http 또는 https 주소를 입력해 주세요.')}}
+$('openBunjang').onclick=()=>openSearch('bunjangUrl');$('openDaangn').onclick=()=>openSearch('daangnUrl');
+if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+render();
+</script>
+</body></html>
